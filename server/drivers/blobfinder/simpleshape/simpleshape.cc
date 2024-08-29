@@ -106,8 +106,26 @@ driver
 #include <string.h>
 #include "../../base/imagebase.h"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/opencv.hpp>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/highgui/highgui_c.h"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/imgproc/imgproc_c.h"
+#include "opencv2/imgcodecs/legacy/constants_c.h"
+
+
+/* CvScalar re-definition */
+inline CvScalar to_CvScalar(cv::Scalar s)
+{
+    CvScalar ret;
+
+    ret.val[0] = s.val[0]; // blue
+    ret.val[1] = s.val[1]; // green
+    ret.val[2] = s.val[2]; // red
+    ret.val[3] = s.val[3]; // alpha
+
+    return ret;
+}
 
 // Invariant feature set for a contour
 class FeatureSet
@@ -297,7 +315,7 @@ int SimpleShape::LoadModel()
   double area, maxArea;
 
   // Load the image
-  img = cvLoadImage(this->modelFilename, 0);
+  img = cvLoadImage( this->modelFilename, 0);
   if (img == NULL)
   {
     PLAYER_ERROR("failed to load model file");
@@ -475,8 +493,8 @@ void SimpleShape::FindShapes()
 
     // Draw eligable contour on the output image; useful for debugging
     if (this->debugcam)
-      cvDrawContours(this->outSubImages + 2, contour, CV_RGB(255, 255, 255),
-                     CV_RGB(255, 255, 255), 0, 1, 8);
+      cvDrawContours(this->outSubImages + 2, contour, to_CvScalar(CV_RGB(255, 255, 255)),
+                     to_CvScalar(CV_RGB(255, 255, 255)), 0, 1, 8);
 
     // Compute the contour features
     this->ExtractFeatureSet((CvContour*) contour, &featureSet);
@@ -489,10 +507,10 @@ void SimpleShape::FindShapes()
     // Draw contour on the main image; useful for debugging
     if (this->debugcam)
     {
-      cvDrawContours(this->outSubImages + 3, contour, CV_RGB(128, 128, 128),
-                     CV_RGB(128, 128, 128), 0, 1, 8);
+      cvDrawContours(this->outSubImages + 3, contour, to_CvScalar(CV_RGB(128, 128, 128)),
+                     to_CvScalar(CV_RGB(128, 128, 128)), 0, 1, 8);
       cvRectangle(this->outSubImages + 3, cvPoint(rect.x, rect.y),
-                  cvPoint(rect.x + rect.width, rect.y + rect.height), CV_RGB(255, 255, 255), 1);
+                  cvPoint(rect.x + rect.width, rect.y + rect.height), to_CvScalar(CV_RGB(255, 255, 255)), 1);
     }
 
     // Check for overrun
