@@ -113,7 +113,6 @@ driver
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgcodecs/legacy/constants_c.h"
 
-
 /* CvScalar re-definition */
 inline CvScalar to_CvScalar(cv::Scalar s)
 {
@@ -310,13 +309,17 @@ void SimpleShape::MainQuit()
 int SimpleShape::LoadModel()
 {
   IplImage *img, *work;
+  cv::Mat img2 = cv::cvarrToMat(img);
   CvSize size;
   CvSeq *contour, *maxContour;
   double area, maxArea;
 
   // Load the image
-  img = cvLoadImage( this->modelFilename, 0);
-  if (img == NULL)
+  //img = cvLoadImage( this->modelFilename, 0);
+  img2 = cv::imread( this->modelFilename, cv::IMREAD_GRAYSCALE );
+
+  //if (img == NULL)
+  if ( img2.empty () )
   {
     PLAYER_ERROR("failed to load model file");
     return -1;

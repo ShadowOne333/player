@@ -101,7 +101,6 @@ driver
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgcodecs/legacy/constants_c.h"
 
-
 class ImageSeq : public ThreadedDriver
 {
   // Constructor
@@ -205,10 +204,14 @@ int ImageSeq::LoadImage(const char *filename)
   char *src;
   uint8_t *dst;
   IplImage *image;
+  cv::Mat image2 = cv::cvarrToMat(image);
 
   // Load image; currently forces the image to mono
-  image = cvLoadImage(filename, -1);
-  if(image == NULL)
+  //image = cvLoadImage(filename, -1);
+  image2 = cv::imread( filename, cv::IMREAD_UNCHANGED );
+
+  //if(image == NULL)
+  if( image2.empty() )
   {
   		PLAYER_ERROR1("Could not load image file: %s", filename);
 		return -1;
